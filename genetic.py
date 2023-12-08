@@ -47,10 +47,7 @@ class genetic:
                 )
             )
         )
-
-        # # Check for conflicts where teachers or groups teach the wrong subject
         conflicts += sum(1 for c in chromosome if c.teacher.subjects.count(c.subject) == 0)
-
         for lesson in chromosome:
             if(lesson.subject not in lesson.teacher.subjects):
                 conflicts += 1
@@ -66,11 +63,24 @@ class genetic:
             if teacher_name not in teaching_hours:
                 teaching_hours[teacher_name] = 0
             teaching_hours[teacher_name] += 1
-        
-
         for teacher_name, hours in teaching_hours.items():
             if hours > [c.hours for c in self.teachers if c.name == teacher_name][0]:
                 conflicts += 1
+
+        group_hours = {}
+        for lesson in chromosome:
+            group = lesson.group.name
+            s = lesson.subject
+            if group+'---'+s.name not in group_hours:
+                group_hours[group+'---'+s.name] = 0
+            group_hours[group+'---'+s.name] += 1
+
+        for group_subject, hours in group_hours.items():
+            group,subject = group_subject.split("---")
+            for g in self.groups:
+                for s, h in g.subjects_hours:
+                    if(s.name == subject and g.name == group and h<hours):
+                        conflicts += 1
 
        # print(f"Conflicts: {conflicts}, rating: {1.0 / (1.0 + conflicts)}")
         return 1.0 / (1.0 + conflicts)
@@ -123,9 +133,9 @@ class genetic:
         if random.random() < mutation_rate:
             for i in range(len(chromosome)):
                 lesson = chromosome[i]
-                #chromosome[i].subject = random.choice(self.subjects)
-                #chromosome[i].teacher = random.choice(self.teachers)
-                #chromosome[i].group = random.choice(self.groups)
+                chromosome[i].subject = random.choice(self.subjects)
+                chromosome[i].teacher = random.choice(self.teachers)
+                chromosome[i].group = random.choice(self.groups)
                 chromosome[i].audience = random.choice(self.audiences)
                 chromosome[i].pair = random.choice(range(1,self.max_lessons+1))
                 chromosome[i].day = random.choice(range(1,6))

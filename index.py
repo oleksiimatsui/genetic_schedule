@@ -27,7 +27,7 @@ subjects = [math, physics, geography, chemistry, history]
 max_lessons = 3
 
 g = genetic(subjects,teachers,groups,audiences,max_lessons)
-schedule = g.solve(500, 1000, 0.8, 0.01)
+schedule = g.solve(500, 1000, 0.8, 0.001)
 for p in schedule[0]:
     p.print()
     print("--------")
